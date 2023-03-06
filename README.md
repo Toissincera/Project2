@@ -12,4 +12,6 @@ Ideally, GitHub offers forking and merging - integrated tools for this very thin
 
 If you have any questions, remember we are a team. Like....Avengers, but way less cool. Let's get frustrated about our bugs together.
 
+[NOTE] If you wanna quickly go back to main page, click <> Code. Remember to save as you work.
+
 Cheers, Uzman
