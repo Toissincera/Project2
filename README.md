@@ -4,7 +4,7 @@ For our first Github project, and btw its more complicated because we are collab
 
 Click on Code1.1_Uzman and thats what we can work on as 'main,' so like the finished thing. Like the front stage of a play
 
-Please create your own Code1.1_YOURNAME and work on your code there. Write, execute, debug, chill. No judgement.
+I made everyone their work sections and we can work on your code there. Write, execute, debug, chill. No judgement.
 
 When you feel a section of your code is ready, just Whatsapp me and I'll add that part. Simple.
 
