@@ -1,1 +1,130 @@
-# Hey its me, Jyoti, working here
+# importing library
+
+import os
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+
+# Increase the print output
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+
+
+os.chdir("C:\\Users\\hp\\Documents\\DaTa sci\\Project Data\\Finance DS")
+
+# Read the data
+fullRaw=pd.read_csv("finance_train.csv")
+fullRaw.head()
+
+
+############################
+# Sampling: Divide the data into Train and Testset
+############################
+from sklearn.model_selection import train_test_split
+trainDf = train_test_split(fullRaw, random_state = 123)
+
+
+# Create Source Column in both Train and Test
+fullRaw['Source'] = 'Train'
+
+fullRaw.head()
+# Check for NAs
+fullRaw.isnull().sum()
+
+# Let us check the counts of 1's & 2's count in dataset
+fullRaw['Revenue.Grid'].value_counts()
+
+# % Split of 1s and 2s
+fullRaw.loc[fullRaw['Source'] == 'Train', 'Revenue.Grid'].value_counts()/ fullRaw[fullRaw['Source'] == 'Train'].shape[0]
+
+#fullRaw['Revenue.Grid'].value_counts(normalize=True)
+
+# Summarize the data
+fullRaw_Summary = fullRaw.describe()
+# fullRaw_Summary = fullRaw.describe(include = "all")
+fullRaw_Summary
+
+# Lets drop 'Customer ID' column from the data as it is not going to assist us in our model
+fullRaw.drop(['REF_NO'], axis = 1, inplace = True) 
+fullRaw.shape
+
+
+# Use data description excel sheet to convert numeric variables to categorical variables
+############################
+
+# Categorical variables: Gender, Academic_Qualification, Marital
+
+
+variableToUpdate = 'children'
+fullRaw[variableToUpdate].value_counts() # To check the unique categories of the variable
+fullRaw[variableToUpdate].replace({1:"Single Child", 
+                                     2:"Two Children",
+                                     3:"Three Children",
+                                     'Zero':"No Child"},inplace=True)
+fullRaw[variableToUpdate].value_counts()
+
+# Dummy variable creation
+############################
+fullRaw2 = pd.get_dummies(fullRaw, drop_first = True) # 'Source'  column will change to 'Source_Train' and it contains 0s and 1s
+fullRaw2.shape
+
+fullRaw2
+
+# Add Intercept Column
+############################
+
+# In Python, logistic regression function does NOT account for an intercept.
+# So, we need to specify a column which has a constant value of 1 
+from statsmodels.api import add_constant
+fullRaw = add_constant(fullRaw)
+fullRaw.shape
+
+# VIF check
+#########################
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+tempMaxVIF = 10 # This VIF variable will be calculated at EVERY iteration in the while loop
+maxVIF = 10
+fullRawCopy = fullRaw.copy()
+counter = 1
+highVIFColumnNames = []
+
+while (tempMaxVIF >= maxVIF):
+    
+    print(counter)
+    
+    # Create an empty temporary df to store VIF values
+    tempVIFDf = pd.DataFrame()
+    
+    # Calculate VIF using list comprehension
+    tempVIFDf['VIF'] = [variance_inflation_factor(fullRawCopy.values,i) for i in range(fullRawCopy.shape[1])]
+    
+    #  VIF values from list comprehension
+    tempVIFDf['Column_Name'] = fullRawCopy.columns
+    
+    # Drop NA rows from the df 
+    tempVIFDf.dropna(inplace=True)
+    
+    # pick the top most column name (which has the highest VIF)
+    tempColumnName = tempVIFDf.sort_values(["VIF"], ascending = False).iloc[0,1]
+    
+    # Store the max VIF value in tempMaxVIF
+    tempMaxVIF = tempVIFDf.sort_values(["VIF"], ascending = False).iloc[0,0]
+    
+    if (tempMaxVIF >= maxVIF): 
+        
+        # Remove the highest VIF valued "Column" 
+        fullRawCopy = fullRawCopy.drop(tempColumnName, axis = 1)    
+        highVIFColumnNames.append(tempColumnName)
+        print(tempColumnName)
+    
+    counter = counter + 1
+
+highVIFColumnNames
+
+
+highVIFColumnNames.remove('const') # We need to exclude 'const' column 
+highVIFColumnNames
