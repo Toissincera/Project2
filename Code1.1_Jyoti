@@ -20,25 +20,16 @@ fullRaw=pd.read_csv("finance_train.csv")
 fullRaw.head()
 
 
-############################
-# Sampling: Divide the data into Train and Testset
-############################
-from sklearn.model_selection import train_test_split
-trainDf = train_test_split(fullRaw, random_state = 123)
-
-
-# Create Source Column in both Train and Test
-fullRaw['Source'] = 'Train'
 
 fullRaw.head()
 # Check for NAs
-fullRaw.isnull().sum()
+train.isnull().sum()
 
 # Let us check the counts of 1's & 2's count in dataset
 fullRaw['Revenue.Grid'].value_counts()
 
 # % Split of 1s and 2s
-fullRaw.loc[fullRaw['Source'] == 'Train', 'Revenue.Grid'].value_counts()/ fullRaw[fullRaw['Source'] == 'Train'].shape[0]
+fullRaw['Revenue.Grid'].value_counts()/ fullRaw.shape[0]
 
 #fullRaw['Revenue.Grid'].value_counts(normalize=True)
 
@@ -52,8 +43,6 @@ fullRaw.drop(['REF_NO'], axis = 1, inplace = True)
 fullRaw.shape
 
 
-# Use data description excel sheet to convert numeric variables to categorical variables
-############################
 
 # Categorical variables: Gender, Academic_Qualification, Marital
 
@@ -71,16 +60,14 @@ fullRaw[variableToUpdate].value_counts()
 fullRaw2 = pd.get_dummies(fullRaw, drop_first = True) # 'Source'  column will change to 'Source_Train' and it contains 0s and 1s
 fullRaw2.shape
 
-fullRaw2
-
 # Add Intercept Column
 ############################
 
 # In Python, logistic regression function does NOT account for an intercept.
 # So, we need to specify a column which has a constant value of 1 
 from statsmodels.api import add_constant
-fullRaw = add_constant(fullRaw)
-fullRaw.shape
+fullRaw2 = add_constant(fullRaw2)
+fullRaw2.shape
 
 # VIF check
 #########################
@@ -88,10 +75,9 @@ from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 tempMaxVIF = 10 # This VIF variable will be calculated at EVERY iteration in the while loop
 maxVIF = 10
-fullRawCopy = fullRaw.copy()
+fullRawCopy = fullRaw2.copy()
 counter = 1
 highVIFColumnNames = []
-
 while (tempMaxVIF >= maxVIF):
     
     print(counter)
@@ -100,24 +86,24 @@ while (tempMaxVIF >= maxVIF):
     tempVIFDf = pd.DataFrame()
     
     # Calculate VIF using list comprehension
-    tempVIFDf['VIF'] = [variance_inflation_factor(fullRawCopy.values,i) for i in range(fullRawCopy.shape[1])]
+    tempVIFDf['VIF'] = [variance_inflation_factor(fullRaw2.values, i) for i in range(fullRaw2.shape[1])]
     
-    #  VIF values from list comprehension
-    tempVIFDf['Column_Name'] = fullRawCopy.columns
+    # Create a new column "Column_Name" to store the col names against the VIF values from list comprehension
+    tempVIFDf['Column_Name'] = fullRaw2.columns
     
-    # Drop NA rows from the df 
+    # Drop NA rows from the df - If there is some calculation error resulting in NAs
     tempVIFDf.dropna(inplace=True)
     
-    # pick the top most column name (which has the highest VIF)
+    # Sort the df based on VIF values, then pick the top most column name (which has the highest VIF)
     tempColumnName = tempVIFDf.sort_values(["VIF"], ascending = False).iloc[0,1]
     
     # Store the max VIF value in tempMaxVIF
     tempMaxVIF = tempVIFDf.sort_values(["VIF"], ascending = False).iloc[0,0]
     
-    if (tempMaxVIF >= maxVIF): 
+    if (tempMaxVIF >= maxVIF): # This condition will ensure that columns having VIF lower than 10 are NOT dropped
         
-        # Remove the highest VIF valued "Column" 
-        fullRawCopy = fullRawCopy.drop(tempColumnName, axis = 1)    
+        # Remove the highest VIF valued "Column" from trainXCopy. As the loop continues this step will keep removing highest VIF columns one by one 
+        fullRaw2 = fullRaw2.drop(tempColumnName, axis = 1)    
         highVIFColumnNames.append(tempColumnName)
         print(tempColumnName)
     
