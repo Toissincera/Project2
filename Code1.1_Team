@@ -1,4 +1,5 @@
 # THIS IS THE MAIN CODE, we compile our final code here, our indivisual workspaces are backstage, this is frontstage
+# This is a branch, I branched to edit the original skeleton while preserving it, and once satisfied with updated skeleton, I merge update into original. Simple.
 
 # Import libraries
 
