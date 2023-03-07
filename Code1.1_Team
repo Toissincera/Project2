@@ -1,0 +1,32 @@
+# THIS IS THE MAIN CODE, we compile our final code here, our indivisual workspaces are backstage, this is frontstage
+
+# Import libraries
+
+
+# Introduce yaself to data, size, length, width, distribution, dreamy blue eyes et al.
+
+
+# Data munging. Lottttta stuff:
+# Missing data
+# Straight up wrong data (2 instances)
+# Convert weirdly syntaxed data into normal floats
+# Create new columns from above for DD and AN
+# Categorical Data definition
+# ANything else y'all think goes here? 
+
+
+# Oh and, featture selection, a whole new can of worms
+# Feature Extraction
+# STraight up Feature Synthesis from either
+#                                         Multiple feature combination
+#                                         Single Feature manipulation
+
+
+# Correlation map
+# Scatter Matrix and stuff
+
+
+# Research on each feature and their individual IRL importance to data
+# Alongwith VIF et al.
+
+# Okay and that should be it for now
