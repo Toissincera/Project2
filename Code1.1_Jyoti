@@ -56,6 +56,11 @@ fullRaw[variableToUpdate].replace({1:"Single Child",
                                      'Zero':"No Child"},inplace=True)
 fullRaw[variableToUpdate].value_counts()
 
+variableToUpdate = 'age_band'
+fullRaw[variableToUpdate].value_counts() # To check the unique categories of the variable
+fullRaw[variableToUpdate].replace({1A:"18-21", 1B:"22-25",2A:"26-30",2B:"31-35",3A:"36-40",3B:"41-45",4A:"45-50",4B:"51-55",5A:"55-60",5B:"61-65",6A:"65-70",6B:"71+"})
+fullRaw[variableToUpdate].value_counts()
+
 # Dummy variable creation
 ############################
 fullRaw2 = pd.get_dummies(fullRaw, drop_first = True) # 'Source'  column will change to 'Source_Train' and it contains 0s and 1s
