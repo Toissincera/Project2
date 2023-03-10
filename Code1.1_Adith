@@ -1,1 +1,429 @@
 # Hello, I am Adith, I code here, welcome to the rock
+# In[2]:
+
+
+import pandas as pd 
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+# In[3]:
+
+
+pd.set_option('display.max_rows',500)
+pd.set_option('display.max_columns',500)
+pd.set_option('display.width',1000)
+
+
+# In[4]:
+
+
+data=pd.read_csv('finance_train.csv')
+data_train=data.copy()
+
+
+# In[5]:
+
+
+data_train.head()
+
+
+# In[6]:
+
+
+data.shape
+
+
+# In[7]:
+
+
+data_test=pd.read_csv('finance_test.csv').copy()
+
+
+# In[8]:
+
+
+data_test.head()
+
+
+# In[341]:
+
+
+data_test.shape
+
+
+# In[ ]:
+
+
+data_train.head()
+
+
+# In[9]:
+
+
+data_train.isnull().sum()
+
+
+# In[ ]:
+
+
+for i in data_train.columns:
+    if data_train[i].dtypes!='object':
+        plt.boxplot(data_train[i])
+        plt.xlabel(i)
+        plt.show()
+
+
+# In[ ]:
+
+
+data_train.dtypes
+
+
+# In[ ]:
+
+
+data_train['status'].dtypes
+
+
+# In[ ]:
+
+
+sns.heatmap(data_train.corr(),cmap='inferno_r')
+
+
+# In[ ]:
+
+
+data_train['family_income'].value_counts()
+
+
+# In[ ]:
+
+
+data_train.head()
+
+
+# In[ ]:
+
+
+data_train['family_income'].value_counts()
+
+
+# In[ ]:
+
+
+data_train['Revenue.Grid'].value_counts()
+
+
+# In[ ]:
+
+
+data_train['Revenue.Grid'].value_counts()/data_train.shape[0]
+
+
+# # Label Encoding
+
+# In[10]:
+
+
+#Family Income
+
+data_train['family_income'].replace(to_replace='>=35,000',value=4,inplace=True)
+data_train['family_income'].replace(to_replace=['< 8,000, >= 4,000','<10,000, >= 8,000'],value=[1,1],inplace=True)
+data_train['family_income'].replace(to_replace=['<12,500, >=10,000','<15,000, >=12,500','<17,500, >=15,000','<20,000, >=17,500'],value=[2,2,2,2],inplace=True)
+data_train['family_income'].replace(to_replace=['<22,500, >=20,000','<25,000, >=22,500','<27,500, >=25,000','<30,000, >=27,500'],value=[3,3,3,3],inplace=True)
+data_train['family_income'].replace(to_replace=['< 4,000'],value=[0],inplace=True)
+data_train['family_income'].replace(to_replace=['Unknown'],value=[5],inplace=True)
+
+
+# In[11]:
+
+
+#Gender
+
+data_train['gender'].replace(to_replace=['Male','Female','Unknown'],value=[1,2,0],inplace=True)
+
+
+# In[12]:
+
+
+#Age_Band
+
+data_train['age_band'].replace(to_replace=['18-21','22-25','26-30'],value=[1,1,1],inplace=True)
+data_train['age_band'].replace(to_replace=['31-35','36-40'],value=[2,2],inplace=True)
+data_train['age_band'].replace(to_replace=['41-45','45-50'],value=[3,3],inplace=True)
+data_train['age_band'].replace(to_replace=['51-55','55-60'],value=[4,4],inplace=True)
+data_train['age_band'].replace(to_replace=['61-65','65-70'],value=[5,5],inplace=True)
+data_train['age_band'].replace(to_replace='71+',value=6,inplace=True)
+data_train['age_band'].replace(to_replace='Unknown',value=0,inplace=True)
+
+
+# In[13]:
+
+
+from sklearn import preprocessing
+label_encoder=preprocessing.LabelEncoder()
+
+
+# In[14]:
+
+
+#Status
+data_train['status']=label_encoder.fit_transform(data_train['status'])
+
+
+# In[15]:
+
+
+#Occupation
+data_train['occupation']=label_encoder.fit_transform(data_train['occupation'])
+
+
+# In[16]:
+
+
+q=[]
+for i in data.columns:
+    if data[i].dtypes=='object':
+        q.append(i)
+print(q)
+len(q)
+
+q.remove('post_area')
+q.remove('post_code')
+q.remove('age_band')
+q.remove('family_income')
+len(q)
+
+
+# In[17]:
+
+
+l=q
+
+
+# In[18]:
+
+
+for i in l:
+    data_train[i]=label_encoder.fit_transform(data_train[i])
+    print(i)
+
+
+# # Data Dictionary
+
+# In[ ]:
+
+
+'''Status
+Partner                   1
+Single/Never Married      2
+Divorced/Separated        0
+Widowed                   4
+Unknown                   3'''
+
+'''Region
+South East           8
+North West           5
+Unknown              10
+South West           9
+West Midlands        12
+Scotland             7
+East Midlands        2
+North                4
+Wales                11
+East Anglia          1
+Northern Ireland     6
+Isle of Man          3
+Channel Islands      0'''
+
+'''Professional      4
+Retired              5
+Secretarial/Admin    6
+Housewife            1
+Business Manager     0
+Manual Worker        2
+Unknown              8
+Other                3
+Student              7'''
+
+'''TV area
+Central           3
+Carlton           2
+Meridian          7
+Yorkshire         13
+Granada           5
+HTV               6
+Anglia            0
+Tyne Tees         10
+Scottish TV       8
+TV South West     9
+Grampian          4
+Unknown           12
+Ulster            11
+Border            1'''
+
+'''self_employed
+No     0
+Yes    1'''
+
+'''self_employed_partner
+No     0
+Yes    1'''
+
+'''home_status
+Own Home                 1
+Rent from Council/HA     3
+Rent Privately           2
+Live in Parental Hom     0
+Unclassified             4'''
+
+'''occupation
+Professional         4
+Retired              5
+Secretarial/Admin    6
+Housewife            1
+Business Manager     0
+Manual Worker        2
+Unknown              8
+Other                3
+Student              7'''
+
+'''occupation_partner
+Unknown              8
+Professional         4
+Retired              5
+Manual Worker        2
+Business Manager     0
+Secretarial/Admin    6
+Housewife            1
+Other                3
+Student              7'''
+
+'''children
+Zero    4
+1       0
+2       1
+3       2
+4+      3'''
+
+'''Gender
+Female    2
+Male      1
+Unknown   0'''
+
+'''family_income
+<4,000            0
+<10,000,>=4,000   1
+<20,000,>=10,000  2
+<30,000,>=20,000  3
+>=35,000          4
+Unknown           5
+'''
+'''Age_band
+18-30     1
+31-40     2
+41-50     3
+51-60     4
+61-70     5
+70+       6
+Unknown   0
+'''
+
+
+# In[19]:
+
+
+data_train.head()
+
+
+# In[377]:
+
+
+postal=[i[:2] for i in data_train['post_area']]
+
+
+# In[381]:
+
+
+postal=pd.Series(postal)
+
+
+# In[382]:
+
+
+postal.value_counts()
+
+
+# In[383]:
+
+
+data_train.values
+
+
+# In[20]:
+
+
+copy_data=data_train.copy()
+copy_data.drop(['Revenue.Grid'],axis=1,inplace=True)
+copy_data.head()
+copy_data.shape
+
+
+# In[21]:
+
+
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from statsmodels.api import add_constant
+
+
+# In[22]:
+
+
+vif_data = pd.DataFrame()
+vif_data["feature"] = copy_data.columns  
+
+
+# In[23]:
+
+
+constant=add_constant(copy_data)
+constant.shape
+
+
+# In[26]:
+
+
+constant['const'].value_counts()
+
+
+# In[30]:
+
+
+vif_data['VIF']=[variance_inflation_factor(constant.values,i) for i in range (constant.shape[1])]
+
+
+# In[28]:
+
+
+vif_data['feature']
+
+
+# In[31]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
